@@ -1,4 +1,6 @@
 #!/bin/bash
+chmod -R 777 ./common/config/nginx
+chmod -R 777 ./common/config/registry
 
 set -e
 

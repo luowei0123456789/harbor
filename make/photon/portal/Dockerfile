@@ -23,7 +23,14 @@ RUN ls -la \
     && npm run link_lib \
     && node --max_old_space_size=2048 'node_modules/@angular/cli/bin/ng' build --prod
 
-FROM goharbor/harbor-portal-base:${harbor_base_image_version}
+FROM photon:3.0
+
+RUN tdnf install -y nginx sudo >> /dev/null \
+    && ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log \
+    && groupadd -r -g 10000 nginx && useradd --no-log-init -r -g 10000 -u 10000 nginx \
+    && chown -R nginx:nginx /etc/nginx \
+    && tdnf clean all
 
 COPY --from=nodeportal /build_dir/dist /usr/share/nginx/html
 COPY --from=nodeportal /build_dir/swagger.yaml /usr/share/nginx/html

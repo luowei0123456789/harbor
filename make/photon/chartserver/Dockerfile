@@ -1,5 +1,10 @@
 ARG harbor_base_image_version
-FROM goharbor/harbor-chartserver-base:$harbor_base_image_version
+FROM photon:3.0
+
+RUN tdnf install -y shadow sudo >>/dev/null\
+    && tdnf clean all \
+    && groupadd -r -g 10000 chart \
+    && useradd --no-log-init -m -g 10000 -u 10000 chart
 
 COPY ./make/photon/chartserver/binary/chartm /home/chart/
 COPY ./make/photon/chartserver/docker-entrypoint.sh /home/chart/

@@ -1,5 +1,10 @@
 ARG harbor_base_image_version
-FROM goharbor/harbor-registryctl-base:${harbor_base_image_version}
+FROM photon:3.0
+
+RUN tdnf install sudo -y >> /dev/null \
+    && tdnf clean all \
+    && groupadd -r -g 10000 harbor && useradd --no-log-init -m -g 10000 -u 10000 harbor \
+    && mkdir -p /etc/registry
 
 COPY ./make/photon/common/install_cert.sh /home/harbor
 COPY ./make/photon/registry/binary/registry /usr/bin
