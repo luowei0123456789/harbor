@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/debian:buster-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN groupadd -r -g 999 redis && useradd -r -g redis -u 999 redis
@@ -6,14 +6,24 @@ RUN groupadd -r -g 999 redis && useradd -r -g redis -u 999 redis
 # grab gosu for easy step-down from root
 # https://github.com/tianon/gosu/releases
 ENV GOSU_VERSION 1.12
+
+WORKDIR /usr/src/app
+COPY make/photon/packages/deb  \
+	/usr/src/app/
+RUN rm /usr/src/app/python-yaml_3.12-1_arm64.deb
+RUN dpkg -i /usr/src/app/*.deb
+COPY make/photon/packages/github/gosu-arm64 /usr/local/bin/gosu
+COPY make/photon/packages/github/gosu-arm64.asc  /usr/local/bin/gosu.asc
+COPY make/photon/packages/github/redis.tar.gz  /usr/src/app/
+
 RUN set -eux; \
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
+#	apt-get update; \
+#	apt-get install -y --no-install-recommends ca-certificates dirmngr gnupg wget; \
 	rm -rf /var/lib/apt/lists/*; \
 	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
+#	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
+#	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
 	export GNUPGHOME="$(mktemp -d)"; \
 	gpg --batch --keyserver hkps://keys.openpgp.org --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
 	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
@@ -33,21 +43,21 @@ ENV REDIS_DOWNLOAD_SHA 53d0ae164cd33536c3d4b720ae9a128ea6166ebf04ff1add3b85f1242
 RUN set -eux; \
 	\
 	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		ca-certificates \
-		wget \
-		\
-		gcc \
-		libc6-dev \
-		make \
-	; \
+#	apt-get update; \
+#	apt-get install -y --no-install-recommends \
+#		ca-certificates \
+#		wget \
+#		\
+#		gcc \
+#		libc6-dev \
+#		make \
+#	; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
-	wget -O redis.tar.gz "$REDIS_DOWNLOAD_URL"; \
-	echo "$REDIS_DOWNLOAD_SHA *redis.tar.gz" | sha256sum -c -; \
+#	wget -O redis.tar.gz "$REDIS_DOWNLOAD_URL"; \
+#	echo "$REDIS_DOWNLOAD_SHA *redis.tar.gz" | sha256sum -c -; \
 	mkdir -p /usr/src/redis; \
-	tar -xzf redis.tar.gz -C /usr/src/redis --strip-components=1; \
+	tar -xzf /usr/src/app/redis.tar.gz -C /usr/src/redis --strip-components=1; \
 	rm redis.tar.gz; \
 	\
 # disable Redis protected mode [1] as it is unnecessary in context of Docker
@@ -100,7 +110,7 @@ COPY ./make/photon/redis/docker-entrypoint.sh /usr/local/bin/
 
 COPY ./make/photon/redis/docker-healthcheck /usr/bin/
 COPY ./make/photon/redis/redis.conf /etc/redis.conf
-RUN chmod +x /usr/bin/docker-healthcheck \
+RUN chmod +x /usr/bin/docker-healthcheck /usr/local/bin/docker-entrypoint.sh  /etc/redis.conf \
     && chown redis:redis /etc/redis.conf
 
 HEALTHCHECK CMD ["docker-healthcheck"]
