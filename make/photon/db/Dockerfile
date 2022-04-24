@@ -1,5 +1,8 @@
 ARG harbor_base_image_version
-FROM photon:3.0
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/caas/photon:3.0
+
+RUN rm -rf /etc/yum.repos.d/*
+COPY ./make/photon/packages/config/harbor.repo /etc/yum.repos.d/harbor.repo
 
 ENV PGDATA /var/lib/postgresql/data
 
@@ -15,7 +18,8 @@ RUN tdnf install -y shadow gzip postgresql >> /dev/null\
     && sed -i "s|#unix_socket_directories = '/tmp'.*|unix_socket_directories = '/run/postgresql'|g" /usr/share/postgresql/postgresql.conf.sample \
     && tdnf clean all
 
-RUN tdnf erase -y toybox && tdnf install -y util-linux net-tools
+#RUN tdnf erase -y toybox && tdnf install -y util-linux net-tools
+RUN tdnf install -y util-linux net-tools
 
 VOLUME /var/lib/postgresql/data
 
@@ -24,8 +28,8 @@ COPY ./make/photon/db/docker-healthcheck.sh /docker-healthcheck.sh
 COPY ./make/photon/db/initial-notaryserver.sql /docker-entrypoint-initdb.d/
 COPY ./make/photon/db/initial-notarysigner.sql /docker-entrypoint-initdb.d/
 COPY ./make/photon/db/initial-registry.sql /docker-entrypoint-initdb.d/
-RUN chown -R postgres:postgres /docker-entrypoint.sh /docker-healthcheck.sh /docker-entrypoint-initdb.d \
-    && chmod u+x /docker-entrypoint.sh /docker-healthcheck.sh
+RUN chown -R postgres:postgres /docker-entrypoint.sh /docker-healthcheck.sh /docker-entrypoint-initdb.d /var/\
+    && chmod u+x /docker-entrypoint.sh /docker-healthcheck.sh /docker-entrypoint-initdb.d/ /var/lib/postgresql/data
 
 ENTRYPOINT ["/docker-entrypoint.sh"]
 HEALTHCHECK CMD ["/docker-healthcheck.sh"]

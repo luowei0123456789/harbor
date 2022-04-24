@@ -1,6 +1,7 @@
 #!/bin/bash
 chmod -R 777 ./common/config/nginx
 chmod -R 777 ./common/config/registry
+chmod 777 ./common/config/registryctl/config.yml
 
 set -e
 

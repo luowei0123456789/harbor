@@ -1,5 +1,7 @@
 ARG harbor_base_image_version
-FROM photon:3.0
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/caas/photon:3.0
+RUN rm -rf /etc/yum.repos.d/*
+COPY ./make/photon/packages/config/harbor.repo /etc/yum.repos.d/harbor.repo
 
 RUN tdnf install sudo -y >> /dev/null\
     && tdnf clean all \
@@ -14,6 +16,8 @@ RUN chown -R harbor:harbor /etc/pki/tls/certs \
     && chown harbor:harbor /home/harbor/entrypoint.sh && chmod u+x /home/harbor/entrypoint.sh \
     && chown harbor:harbor /home/harbor/install_cert.sh && chmod u+x /home/harbor/install_cert.sh \
     && chown harbor:harbor /usr/bin/registry && chmod u+x /usr/bin/registry
+
+ENV PGPATH /var/lib/postgresql && mkdir -p "$PGDATA" && chown -R postgres:postgres "$PGPATH" && chmod 777 "$PGPATH"
 
 HEALTHCHECK CMD curl 127.0.0.1:5000/
 

@@ -1,5 +1,8 @@
 ARG harbor_base_image_version
-FROM photon:3.0
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/caas/photon:3.0
+
+RUN rm -rf /etc/yum.repos.d/*
+COPY ./make/photon/packages/config/harbor.repo /etc/yum.repos.d/harbor.repo
 
 RUN tdnf install sudo tzdata -y >> /dev/null \
     && tdnf clean all \
@@ -11,7 +14,8 @@ COPY ./make/photon/core/harbor_core /harbor/
 COPY ./src/core/views /harbor/views
 COPY ./make/migrations /harbor/migrations
 
-RUN chmod u+x /harbor/harbor_core
+RUN chmod u+x /harbor/harbor_core \
+    && chown -R harbor:harbor /harbor/
 WORKDIR /harbor/
 USER harbor
 ENTRYPOINT ["/harbor/harbor_core"]

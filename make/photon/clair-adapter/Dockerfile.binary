@@ -1,4 +1,4 @@
-FROM golang:1.15.6
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/golang:1.15.6
 
 ADD .   /go/src/github.com/goharbor/harbor-scanner-clair/
 WORKDIR /go/src/github.com/goharbor/harbor-scanner-clair/

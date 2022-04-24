@@ -1,5 +1,8 @@
 ARG harbor_base_image_version
-FROM photon:3.0
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/caas/photon:3.0
+
+RUN rm -rf /etc/yum.repos.d/*
+COPY ./make/photon/packages/config/harbor.repo /etc/yum.repos.d/harbor.repo
 
 RUN tdnf install -y shadow sudo \
     && tdnf clean all \

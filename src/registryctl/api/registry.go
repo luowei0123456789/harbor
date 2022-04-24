@@ -16,12 +16,10 @@ package api
 
 import (
 	"bytes"
-	"net/http"
-	"time"
-
-	"os/exec"
-
 	"github.com/goharbor/harbor/src/common/utils/log"
+	"net/http"
+	"os/exec"
+	"time"
 )
 
 const (

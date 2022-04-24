@@ -87,7 +87,7 @@ CHARTFLAG=false
 
 # version prepare
 # for docker image tag
-VERSIONTAG=dev
+																															VERSIONTAG=dev
 # for base docker image tag
 BASEIMAGETAG=dev
 # for harbor package name

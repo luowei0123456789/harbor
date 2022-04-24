@@ -1,13 +1,18 @@
 ARG harbor_base_image_version
-FROM photon:3.0
+FROM feiteng.harbor.ctyun.cn:5000/feitengky10/caas/photon:3.0
+
+RUN rm -rf /etc/yum.repos.d/*
+COPY ./make/photon/packages/config/harbor.repo /etc/yum.repos.d/harbor.repo
 
 RUN tdnf install sudo tzdata -y >> /dev/null \
     && tdnf clean all \
     && groupadd -r -g 10000 harbor && useradd --no-log-init -r -g 10000 -u 10000 harbor
 
+
 COPY ./make/photon/jobservice/harbor_jobservice /harbor/
 
-RUN chmod u+x /harbor/harbor_jobservice
+RUN chmod u+x /harbor/harbor_jobservice \
+    && chown -R harbor:harbor /harbor/
 
 WORKDIR /harbor/
 

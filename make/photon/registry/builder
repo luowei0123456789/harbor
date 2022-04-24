@@ -20,12 +20,14 @@ cur=$PWD
 
 # the temp folder to store distribution source code...
 TEMP=`mktemp -d ${TMPDIR-/tmp}/distribution.XXXXXX`
-git clone -b $VERSION https://github.com/docker/distribution.git $TEMP
+#git clone -b $VERSION https://github.com/docker/distribution.git $TEMP
+cp -r make/photon/packages/github/distribution/* $TEMP
 
 # add patch 2879
 echo 'add patch https://github.com/docker/distribution/pull/2879 ...'
+cp ../packages/github/2879.patch $TEMP
 cd $TEMP
-wget https://github.com/docker/distribution/pull/2879.patch
+#wget https://github.com/docker/distribution/pull/2879.patch
 git apply 2879.patch
 cd $cur
 
