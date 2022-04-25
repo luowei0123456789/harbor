@@ -83,7 +83,7 @@ BUILDBIN=true
 MIGRATORFLAG=false
 NPM_REGISTRY=https://registry.npmjs.org
 # enable/disable chart repo supporting
-CHARTFLAG=false
+CHARTFLAG=true
 
 # version prepare
 # for docker image tag
