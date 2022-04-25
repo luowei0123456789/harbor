@@ -110,7 +110,7 @@ COPY ./make/photon/redis/docker-entrypoint.sh /usr/local/bin/
 
 COPY ./make/photon/redis/docker-healthcheck /usr/bin/
 COPY ./make/photon/redis/redis.conf /etc/redis.conf
-RUN chmod +x /usr/bin/docker-healthcheck /usr/local/bin/docker-entrypoint.sh  /etc/redis.conf \
+RUN chmod 777 /usr/bin/docker-healthcheck /usr/local/bin/docker-entrypoint.sh  /etc/redis.conf \
     && chown redis:redis /etc/redis.conf
 
 HEALTHCHECK CMD ["docker-healthcheck"]
